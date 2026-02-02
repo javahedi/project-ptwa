@@ -71,16 +71,29 @@ function precompute_A()
     return Ac
 end
 
+
 function local_wigner_probs(ρ::Matrix{ComplexF64}, Ac)
     probs = zeros(Float64, 3, 3)
     for q in 0:2, p in 0:2
         A = Ac[:,:,q+1,p+1]
         probs[q+1,p+1] = real(tr(ρ*A)) / 3
     end
-    probs .= max.(probs, 0.0)
+    # Optional numerical safety
+    @assert minimum(probs) > -1e-12
     probs ./= sum(probs)
     return probs
 end
+
+# function local_wigner_probs(ρ::Matrix{ComplexF64}, Ac)
+#     probs = zeros(Float64, 3, 3)
+#     for q in 0:2, p in 0:2
+#         A = Ac[:,:,q+1,p+1]
+#         probs[q+1,p+1] = real(tr(ρ*A)) / 3
+#     end
+#     probs .= max.(probs, 0.0)
+#     probs ./= sum(probs)
+#     return probs
+# end
 
 function sample_initial_discrete_WH(L::Int, s::Vector{Int}; rng::AbstractRNG, Ac)
     x = [zeros(ComplexF64, 3, 3) for _ in 1:L]
