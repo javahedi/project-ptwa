@@ -362,27 +362,27 @@ if abspath(PROGRAM_FILE) == @__FILE__
     tmax = 200.0  # Shorter for testing
     dt   = 0.1
     
-    nreal = 30  # Fewer realizations for testing
+    nreal_list = [60, 120, 200]  # Fewer realizations for testing
     seed  = 1
     
     krylovdim = 30
     tol = 1e-9
-    save_every = 2  # Save every 2 time steps
-    
-    for L in L_list, W in W_list
+    save_every = 1  # Save every 2 time steps
+    L = L_list[1]
+    for (W, nr) in zip(W_list, nreal_list)
         println("\n" * "="^60)
-        println("Fixed-N Krylov ED: L=$L, W=$W")
+        println("Fixed-N Krylov ED: L=$(L), W=$W, nreal=$(nr)")
         println("="^60)
         
         @time t, I, dim_red = run_disorder_average_parallel(
-            L=L, J=J, g=g, W=W, nreal=nreal,
+            L=L, J=J, g=g, W=W, nreal=nr,
             tmax=tmax, dt=dt, seed=seed,
             krylovdim=krylovdim, tol=tol,
             save_every=save_every
         )
         
-        outfile = "ED_Krylov_fixedN_domainwall_Z3_L$(L)_W$(W)_g$(g).jld2"
-        @save outfile t I L W g J tmax dt nreal krylovdim tol dim_red save_every
+        outfile = "ED_Krylov_fixedN_domainwall_Z3_L$(L)_W$(W)_g$(g)_new.jld2"
+        @save outfile t I L W g J tmax dt nr krylovdim tol dim_red save_every
         println("Saved → $outfile (dim_red=$dim_red)")
         
         # Quick plot to verify
