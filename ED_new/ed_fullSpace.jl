@@ -1,4 +1,4 @@
-###############################################################################
+Yes, ED can be restricted to fixed-N---> ok check this situtaion in my code and do such hilbersapce reduce----> ###############################################################################
 # Matrix-free ED (operator-on-the-fly) + Krylov time evolution
 # Model: disordered Z3 Fock parafermion chain (nearest-neighbor)
 #
@@ -274,7 +274,7 @@ end
 if abspath(PROGRAM_FILE) == @__FILE__
 
     # ---- parameters ----
-    L_list = [12]     # capability demo: include one big L (e.g. 48)
+    L_list = [8]     # capability demo: include one big L (e.g. 48)
     J = 1.0
     g = 0.5
     W_list = [2.5, 4.5, 6.0]
