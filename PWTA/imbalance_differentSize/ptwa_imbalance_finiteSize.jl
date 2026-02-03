@@ -1,7 +1,8 @@
 ###############################################################################
-# pTWA for Z₃ parafermion chain with disorder
-# Observable: domain-wall imbalance I(t)
-# Capability benchmark: multiple system sizes L
+# pTWA for disordered NN Z₃ Fock parafermion chain (matches ED: J, g, μ)
+# H = -J Σ_j [ (1-g) f†_j f_{j+1} + g (f†_j)^2 f_{j+1}^2 + h.c. ] + Σ μ_j n_j
+#
+# Observable: domain-wall imbalance I(t) = (2/L)*(N_L - N_R)
 ###############################################################################
 
 using Random
@@ -14,17 +15,17 @@ using Base.Threads
 
 struct PTWAParams
     L::Int
-    Jr::Vector{Float64}
+    J::Float64
+    g::Float64
     μ::Vector{Float64}
     θ::Float64
 end
 
-function PTWAParams(L::Int; J=1.0, α=6.0, μ=zeros(L))
-    Jr = [Float64(J) / (r^Float64(α)) for r in 1:(L-1)]
-    return PTWAParams(L, Jr, Float64.(μ), 2π/3)
+function PTWAParams(L::Int; J=1.0, g=0.5, μ=zeros(L))
+    return PTWAParams(L, Float64(J), Float64(g), Float64.(μ), 2π/3)
 end
 
-# ============================ Initial states ==================================
+# ============================ Initial state ==================================
 
 function init_domainwall10(L::Int)
     @assert iseven(L)
@@ -84,7 +85,7 @@ function sample_initial_discrete_WH(L::Int, s::Vector{Int}; rng, Ac)
         for q in 0:2, p in 0:2
             acc += probs[q+1,p+1]
             if r ≤ acc
-                x[j] .= Ac[:,:,q+1,p+1]'
+                x[j] .= Ac[:,:,q+1,p+1]'   # x^{ab} = A_{ba}
                 break
             end
         end
@@ -95,69 +96,80 @@ end
 # ============================ Local symbols ===================================
 
 @inline n_symbol(xj) = real(xj[2,2]) + 2.0*real(xj[3,3])
-@inline f_symbol(xj) = xj[1,2] + xj[2,3]
+
+# For your current convention (same as your long-range code):
+# f  = X01 + X12  -> symbol uses x[1,2] + x[2,3]
+# f† = X10 + X21  -> symbol uses x[2,1] + x[3,2]
+@inline f_symbol(xj)    = xj[1,2] + xj[2,3]
 @inline fdag_symbol(xj) = xj[2,1] + xj[3,2]
 
-# ================================ Strings ====================================
+# Pair operators: f^2 = X02, (f†)^2 = X20 in this convention
+@inline f2_symbol(xj)    = xj[1,3]
+@inline fdag2_symbol(xj) = xj[3,1]
 
-@inline function string_factor(params, nbar, i, j)
-    if abs(i-j) ≤ 1
-        return 1.0 + 0im
-    end
-    s = sum(nbar[min(i,j)+1:max(i,j)-1])
-    return cis(params.θ * (i < j ? s : -s))
-end
+# ============================ Gradient (NN only) ==============================
 
-# ============================ Gradient ========================================
-
-function compute_gradient!(G, x, params)
-    L, Jr, μ, θ = params.L, params.Jr, params.μ, params.θ
+function compute_gradient!(G, x, params::PTWAParams)
+    L, J, g, μ, θ = params.L, params.J, params.g, params.μ, params.θ
     fill!.(G, 0.0 + 0im)
 
-    nbar = [n_symbol(x[j]) for j in 1:L]
-    f    = [f_symbol(x[j]) for j in 1:L]
-    fdag = [fdag_symbol(x[j]) for j in 1:L]
+    nbar  = [n_symbol(x[j])   for j in 1:L]
+    f     = [f_symbol(x[j])   for j in 1:L]
+    fdag  = [fdag_symbol(x[j]) for j in 1:L]
+    f2    = [f2_symbol(x[j])  for j in 1:L]
+    fdag2 = [fdag2_symbol(x[j]) for j in 1:L]
 
-    for j in 1:L
+    # onsite μ n
+    @inbounds for j in 1:L
         G[j][2,2] += μ[j]
-        G[j][3,3] += 2μ[j]
+        G[j][3,3] += 2.0 * μ[j]
     end
 
-    for r in 1:(L-1), i in 1:(L-r)
-        j = i+r
-        J = Jr[r]
-        J == 0 && continue
-
-        Sij = string_factor(params, nbar, i, j)
-        Sji = conj(Sij)
-
-        G[i][2,1] += J*Sij*f[j]
-        G[i][3,2] += J*Sij*f[j]
-        G[i][1,2] += J*Sji*fdag[j]
-        G[i][2,3] += J*Sji*fdag[j]
-
-        G[j][2,1] += J*Sji*f[i]
-        G[j][3,2] += J*Sji*f[i]
-        G[j][1,2] += J*Sij*fdag[i]
-        G[j][2,3] += J*Sij*fdag[i]
-
-        if j > i+1
-            amp = J*(fdag[i]*f[j])
-            for k in i+1:j-1
-                G[k][2,2] +=  1im*θ*Sij*amp
-                G[k][3,3] +=  2im*θ*Sij*amp
-                G[k][2,2] += -1im*θ*Sji*conj(amp)
-                G[k][3,3] += -2im*θ*Sji*conj(amp)
-            end
-        end
+    # helpers to add derivatives wrt f, f†, f^2, (f†)^2, and n (if needed)
+    @inline function add_df!(Gj, coef::ComplexF64)
+        Gj[1,2] += coef
+        Gj[2,3] += coef
     end
+    @inline function add_dfdag!(Gj, coef::ComplexF64)
+        Gj[2,1] += coef
+        Gj[3,2] += coef
+    end
+    @inline function add_df2!(Gj, coef::ComplexF64)
+        Gj[1,3] += coef
+    end
+    @inline function add_dfdag2!(Gj, coef::ComplexF64)
+        Gj[3,1] += coef
+    end
+
+    # ---- nearest-neighbor only: strings are trivial, but keep structure ----
+    # Match ED Hamiltonian sign: H_hop = -J[(1-g) f†f + g (f†)^2 f^2 + h.c.]
+    J1 = -J * (1 - g)
+    J2 = -J * g
+
+    @inbounds for j in 1:(L-1)
+        jp = j + 1
+
+        # single hop: J1 ( f†_j f_{j+1} + f†_{j+1} f_j )
+        add_dfdag!(G[j],  J1 * f[jp])
+        add_df!(G[j],     J1 * fdag[jp])
+        add_dfdag!(G[jp], J1 * f[j])
+        add_df!(G[jp],    J1 * fdag[j])
+
+        # pair hop: J2 ( (f†_j)^2 f_{j+1}^2 + (f†_{j+1})^2 f_j^2 )
+        add_dfdag2!(G[j],  J2 * f2[jp])
+        add_df2!(G[j],     J2 * fdag2[jp])
+        add_dfdag2!(G[jp], J2 * f2[j])
+        add_df2!(G[jp],    J2 * fdag2[j])
+    end
+
+    return nothing
 end
 
 # ============================== EOM ===========================================
 
 function rhs!(dx, x, params, G)
     compute_gradient!(G, x, params)
-    for j in 1:params.L
+    @inbounds for j in 1:params.L
         h = transpose(G[j])
         dx[j] .= 1im*(x[j]*h - h*x[j])
     end
@@ -165,13 +177,13 @@ end
 
 function step_rk4!(x, params, dt; k1,k2,k3,k4,tmp,G)
     rhs!(k1,x,params,G)
-    for j in eachindex(x); tmp[j] .= x[j] .+ 0.5dt*k1[j]; end
+    @inbounds for j in eachindex(x); tmp[j] .= x[j] .+ 0.5dt*k1[j]; end
     rhs!(k2,tmp,params,G)
-    for j in eachindex(x); tmp[j] .= x[j] .+ 0.5dt*k2[j]; end
+    @inbounds for j in eachindex(x); tmp[j] .= x[j] .+ 0.5dt*k2[j]; end
     rhs!(k3,tmp,params,G)
-    for j in eachindex(x); tmp[j] .= x[j] .+ dt*k3[j]; end
+    @inbounds for j in eachindex(x); tmp[j] .= x[j] .+ dt*k3[j]; end
     rhs!(k4,tmp,params,G)
-    for j in eachindex(x)
+    @inbounds for j in eachindex(x)
         x[j] .+= dt/6*(k1[j]+2k2[j]+2k3[j]+k4[j])
         x[j] .= (x[j]+x[j]')/2
     end
@@ -186,9 +198,9 @@ function imbalance_domainwall(x)
     return 2*(NL-NR)/L
 end
 
-# ============================ Runner ==========================================
+# ============================ Disorder runner =================================
 
-function run_disorder_imbalance(; L, J, α, W, ntraj, nreal, tmax, dt, seed)
+function run_disorder_imbalance(; L, J, g, W, ntraj, nreal, tmax, dt, seed)
     s = init_domainwall10(L)
     Ac = precompute_A()
     t = collect(0:dt:tmax)
@@ -197,40 +209,54 @@ function run_disorder_imbalance(; L, J, α, W, ntraj, nreal, tmax, dt, seed)
     Threads.@threads for r in 1:nreal
         rng = MersenneTwister(seed+r)
         μ = W*(2rand(rng,L).-1)
-        params = PTWAParams(L; J=J, α=α, μ=μ)
+
+        params = PTWAParams(L; J=J, g=g, μ=μ)
 
         G = [zeros(ComplexF64,3,3) for _ in 1:L]
-        k1=k2=k3=k4=tmp=deepcopy(G)
+        k1 = [zeros(ComplexF64,3,3) for _ in 1:L]
+        k2 = [zeros(ComplexF64,3,3) for _ in 1:L]
+        k3 = [zeros(ComplexF64,3,3) for _ in 1:L]
+        k4 = [zeros(ComplexF64,3,3) for _ in 1:L]
+        tmp = [zeros(ComplexF64,3,3) for _ in 1:L]
 
         I = zeros(length(t))
         for tr in 1:ntraj
-            x = sample_initial_discrete_WH(L,s; rng=rng,Ac=Ac)
+            x = sample_initial_discrete_WH(L, s; rng=rng, Ac=Ac)
             for ti in eachindex(t)
                 I[ti] += imbalance_domainwall(x)
-                ti<length(t) && step_rk4!(x,params,dt; k1=k1,k2=k2,k3=k3,k4=k4,tmp=tmp,G=G)
+                ti < length(t) && step_rk4!(x, params, dt; k1=k1,k2=k2,k3=k3,k4=k4,tmp=tmp,G=G)
             end
         end
         Iavg .+= I/ntraj
     end
+
     return t, Iavg/nreal
 end
 
 # ============================ Main ============================================
 
 if abspath(PROGRAM_FILE)==@__FILE__
-    L_list = [12, 24, 48]
+    println("Using $(Threads.nthreads()) threads")
+
+    # ED-comparison sizes: small only!
+    L_list = [12, 24, 48]           # keep ED feasible
     W_list = [2.5, 4.5, 6.0]
-    α=6.0; J=1.0
-    ntraj=800; nreal=30
-    tmax=200.0; dt=0.1; seed=1
+
+    J = 1.0
+    g = 0.5                     # <-- match ED g here
+
+    ntraj = 1000
+    nreal = 100
+    tmax  = 200.0
+    dt    = 0.1
+    seed  = 1
 
     for L in L_list, W in W_list
-        println("Running L=$L  W=$W")
-        t,I = run_disorder_imbalance(
-            L=L,J=J,α=α,W=W,
-            ntraj=ntraj,nreal=nreal,
-            tmax=tmax,dt=dt,seed=seed
-        )
-        @save "imbalance_Z3_L$(L)_W$(W).jld2" t I L W α J
+        println("Running pTWA NN: L=$L  W=$W  g=$g")
+        t, I = run_disorder_imbalance(L=L, J=J, g=g, W=W,
+                                      ntraj=ntraj, nreal=nreal,
+                                      tmax=tmax, dt=dt, seed=seed)
+
+        @save "pTWA_NN_Z3_domainwall_L$(L)_W$(W)_g$(g).jld2" t I L W g J ntraj nreal tmax dt
     end
 end
