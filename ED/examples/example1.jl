@@ -13,8 +13,10 @@ g  = 0.0
 μ = zeros(L)
 
 # Build model in specific sector
-model = build_model(L; n=n, hopping=long_range_hopping(L,J,α),
-                    pair_hopping=long_range_hopping(L,J,α), mu=μ)
+model = build_model(L; n=n, 
+                        hopping=long_range_hopping(L,J,α),
+                        pair_hopping=long_range_hopping(L,J,α), 
+                        mu=μ)
 
 # -----------------------------
 # Initial state: excite middle site

@@ -64,6 +64,8 @@ function init_state_single_excitation(model, L::Int, n::Int;
     return ψ0, s0
 end
 
+
+
 """
     init_state_neel01(model, L, n)
 
@@ -131,7 +133,7 @@ end
 # ----------------------------- Core: run ED/Krylov ----------------------------
 
 """
-    run_exact_Z3_longrange(; L=13, α=3.0, J=1.0, f=0.8, dt=0.05, steps=80,
+    run_exact_Z3_longrange(; L=13, α=3.0, J=1.0,  dt=0.05, steps=80,
                             init=:single, save_prefix="ED")
 
 Run exact Krylov time evolution for the long-range Z₃ chain and save observables.
@@ -143,7 +145,7 @@ Returns:
 - meta  :: Dict with run parameters
 """
 function run_exact_Z3_longrange(; L::Int=13, α::Float64=3.0, J::Float64=1.0,
-                                f::Float64=0.8, dt::Float64=0.05, steps::Int=80,
+                                 dt::Float64=0.05, steps::Int=80,
                                 init::Symbol=:single, save_prefix::String="ED")
 
     n = 3
@@ -155,7 +157,7 @@ function run_exact_Z3_longrange(; L::Int=13, α::Float64=3.0, J::Float64=1.0,
     # Build model (open boundaries)
     model = build_model(L; n=n,
                         hopping=Jr,
-                        pair_hopping=Jr,
+                        pair_hopping= [],
                         mu=μ)
 
     # Prepare initial state
@@ -221,7 +223,6 @@ function run_exact_Z3_longrange(; L::Int=13, α::Float64=3.0, J::Float64=1.0,
         "n" => n,
         "J" => J,
         "alpha" => α,
-        "f" => f,
         "dt" => dt,
         "steps" => steps,
         "init" => String(init),
@@ -251,7 +252,7 @@ function plot_heatmaps(times, Zt, Pt; α, L, init, prefix="ED")
                    title="ED Re⟨Z_j(t)⟩ (L=$L, α=$α, init=$init)",
                    aspect_ratio=:auto,
                    colorbar_title="Re⟨Z⟩")
-    savefig(pltZ, "$(prefix)_ReZ_heatmap_L$(L)_alpha$(α)_init$(init).pdf")
+    savefig(pltZ, "$(prefix)_ReZ_heatmap_L$(L)_alpha$(α)_init$(init).png")
 
     # Populations
     for a in 1:3
@@ -260,10 +261,10 @@ function plot_heatmaps(times, Zt, Pt; α, L, init, prefix="ED")
                        title="ED population P_$(a-1)(j,t) (L=$L, α=$α, init=$init)",
                        aspect_ratio=:auto,
                        colorbar_title="P")
-        savefig(pltP, "$(prefix)_P$(a-1)_heatmap_L$(L)_alpha$(α)_init$(init).pdf")
+        savefig(pltP, "$(prefix)_P$(a-1)_heatmap_L$(L)_alpha$(α)_init$(init).png")
     end
 
-    println("Saved heatmaps (PDF).")
+    println("Saved heatmaps (PNG).")
 end
 
 # ----------------------------- Main: configure run ----------------------------
@@ -271,18 +272,18 @@ end
 if abspath(PROGRAM_FILE) == @__FILE__
     # Choose L=10/12 for ED comparison with your pTWA; here we use L=13 test.
     L = 15
-    α = 0.5
+    α = 3.0   # α=10 approximates nearest-neighbor; adjust as needed for comparison
     J = 1.0
-    f = 0.8
+    
 
-    dt = 0.025
+    dt = 0.05
     steps = 80
 
     # Initial state options: :single, :neel01, :domainwall
     init = :single
 
     times, Zt, Pt, P1t, S, R2, meta =
-    run_exact_Z3_longrange(L=L, α=α, J=J, f=f,
+    run_exact_Z3_longrange(L=L, α=α, J=J, 
                            dt=dt, steps=steps,
                            init=init, save_prefix="ED")
 
