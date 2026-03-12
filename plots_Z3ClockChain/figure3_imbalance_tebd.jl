@@ -6,8 +6,8 @@ using DelimitedFiles
 
 # ===================== PARAMETERS =====================
 
-L       = 10
-sampler = "gaussian"
+L       = 12
+sampler = "gaussian" # "discrete" or "gaussian"
 
 W_list = [0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0]
 seed_list = 0:8
@@ -42,6 +42,7 @@ ax = Axis(
     xgridvisible = true,
     ygridvisible = true,
 )
+text!(ax,0.05,0.05,text="$sampler",space=:relative,fontsize=24,color=:black)
 
 # ===================== COLORMAP =====================
 
@@ -53,8 +54,8 @@ crange = (minimum(W_list), maximum(W_list))
 Iavg = Float64[]
 
 for W in W_list
-                   
-    filename = "../pTWA_Z3ClockChain/parafermion_Z3/output/pTWA_Z3_parafermion_L$(L)_g0.3_W$(W)_Ndis100_Nmc100_gaussian.jld2"
+                                                           
+    filename = "../pTWA_Z3ClockChain/parafermion_Z3/output/pTWA_Z3_parafermion_L$(L)_g0.3_W$(W)_Ndis100_Nmc100_$(sampler).jld2"
 
     @load filename times I_mean
 
@@ -131,7 +132,7 @@ ax_in = Axis(
     halign = 0.97,
     valign = 0.97,
     xlabel = L"W",
-    ylabel = L"\bar{\mathcal{I}}",
+    ylabel = L"\bar{I}_{t\in[2,20]}",
     xticklabelsize = 9,
     yticklabelsize = 9,
     xlabelsize = 16,
@@ -168,7 +169,7 @@ scatter!(
 
 # ===================== SAVE =====================
 
-save("Fig3_Imbalance_L$(L)_g0.3.pdf", fig)
-save("Fig3_Imbalance_L$(L)_g0.3.png", fig)
+save("Fig3_Imbalance_L$(L)_$(sampler).pdf", fig)
+save("Fig3_Imbalance_L$(L)_$(sampler).png", fig)
 
 println("Saved Makie figure successfully.")
