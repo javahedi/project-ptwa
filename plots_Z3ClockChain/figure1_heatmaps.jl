@@ -40,20 +40,22 @@ end
 
 α = 3.0
 
-@load "../ED_Z3ClockChain/ED_Z3_L13_alpha$(α)_g0.5_single_excitation.jld2" times Pexc
+@load "../ED_Z3ClockChain/Z3/ED_Z3_L13_alpha$(α)_g0.5_single_excitation.jld2" times Pexc
 hm1 = heatmap!(ax11, 1:L, times, Pexc,
     colormap=:blues,
     colorrange=(0,1)
 )
 
-@load "../pTWA_Z3ClockChain/pTWA_Z3_L13_alpha$(α)_g0.5_single_excitation_gaussian_N10000.jld2" times Pexc_avg
+@load "../pTWA_Z3ClockChain/clock_Z3/pTWA_Z3_L13_alpha$(α)_g0.5_single_excitation_gaussian_N10000.jld2" times Pexc_avg
 heatmap!(ax12, 1:L, times, Pexc_avg,
     colormap=:blues,
     colorrange=(0,1)
 )
 
-text!(ax11,0.05,0.2,text=L"\alpha=3.0,~~ED",space=:relative,fontsize=28,color=:white)
-text!(ax12,0.05,0.2,text=L"\alpha=3.0,~~pTWA",space=:relative,fontsize=28,color=:white)
+text!(ax11,0.05,0.1,text=L"\alpha=3.0",space=:relative,fontsize=32,color=:black)
+text!(ax11,0.7,0.1,text=L"Exact",space=:relative,fontsize=32,color=:black)
+text!(ax12,0.05,0.1,text=L"\alpha=3.0",space=:relative,fontsize=32,color=:black)
+text!(ax12,0.7,0.1,text=L"pTWA",space=:relative,fontsize=32,color=:black)
 
 ###################################################
 # α = 1.5  (NEW)
@@ -61,20 +63,22 @@ text!(ax12,0.05,0.2,text=L"\alpha=3.0,~~pTWA",space=:relative,fontsize=28,color=
 
 α = 1.5
 
-@load "../ED_Z3ClockChain/ED_Z3_L13_alpha$(α)_g0.5_single_excitation.jld2" times Pexc
+@load "../ED_Z3ClockChain/Z3/ED_Z3_L13_alpha$(α)_g0.5_single_excitation.jld2" times Pexc
 heatmap!(ax21, 1:L, times, Pexc,
     colormap=:blues,
     colorrange=(0,1)
 )
 
-@load "../pTWA_Z3ClockChain/pTWA_Z3_L13_alpha$(α)_g0.5_single_excitation_gaussian_N10000.jld2" times Pexc_avg
+@load "../pTWA_Z3ClockChain/clock_Z3/pTWA_Z3_L13_alpha$(α)_g0.5_single_excitation_gaussian_N10000.jld2" times Pexc_avg
 heatmap!(ax22, 1:L, times, Pexc_avg,
     colormap=:blues,
     colorrange=(0,1)
 )
 
-text!(ax21,0.05,0.2,text=L"\alpha=1.5,~~ED",space=:relative,fontsize=28,color=:white)
-text!(ax22,0.05,0.2,text=L"\alpha=1.5,~~pTWA",space=:relative,fontsize=28,color=:white)
+text!(ax21,0.05,0.1,text=L"\alpha=1.5",space=:relative,fontsize=32,color=:black)
+text!(ax21,0.7,0.1,text=L"Exact",space=:relative,fontsize=32,color=:black)
+text!(ax22,0.05,0.1,text=L"\alpha=1.5",space=:relative,fontsize=32,color=:black)
+text!(ax22,0.7,0.1,text=L"pTWA",space=:relative,fontsize=32,color=:black)
 
 ###################################################
 # α = 0.5
@@ -82,20 +86,22 @@ text!(ax22,0.05,0.2,text=L"\alpha=1.5,~~pTWA",space=:relative,fontsize=28,color=
 
 α = 0.5
 
-@load "../ED_Z3ClockChain/ED_Z3_L13_alpha$(α)_g0.5_single_excitation.jld2" times Pexc
+@load "../ED_Z3ClockChain/Z3/ED_Z3_L13_alpha$(α)_g0.5_single_excitation.jld2" times Pexc
 heatmap!(ax31, 1:L, times, Pexc,
     colormap=:blues,
     colorrange=(0,1)
 )
 
-@load "../pTWA_Z3ClockChain/pTWA_Z3_L13_alpha$(α)_g0.5_single_excitation_gaussian_N10000.jld2" times Pexc_avg
+@load "../pTWA_Z3ClockChain/clock_Z3/pTWA_Z3_L13_alpha$(α)_g0.5_single_excitation_gaussian_N10000.jld2" times Pexc_avg
 heatmap!(ax32, 1:L, times, Pexc_avg,
     colormap=:blues,
     colorrange=(0,1)
 )
 
-text!(ax31,0.05,0.2,text=L"\alpha=0.5,~~ED",space=:relative,fontsize=28,color=:white)
-text!(ax32,0.05,0.2,text=L"\alpha=0.5,~~pTWA",space=:relative,fontsize=28,color=:white)
+text!(ax31,0.05,0.1,text=L"\alpha=0.5",space=:relative,fontsize=32,color=:black)
+text!(ax31,0.7,0.1,text=L"Exact",space=:relative,fontsize=32,color=:black)
+text!(ax32,0.05,0.1,text=L"\alpha=0.5",space=:relative,fontsize=32,color=:black)
+text!(ax32,0.7,0.1,text=L"pTWA",space=:relative,fontsize=32,color=:black)
 
 ###################################################
 # Shared colorbar

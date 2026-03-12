@@ -21,11 +21,11 @@ fig = Figure(size = (1000,900))
 
 # α = 3.0
 ax11 = Axis(fig[1,1], ylabel=L"P_{\mathrm{exc}}(j_0,t)")
-ax12 = Axis(fig[1,2], ylabel=L"\langle |j-j_0| \rangle")
+ax12 = Axis(fig[1,2], ylabel=L"\bar{r}(t)")#\langle |j-j_0| \rangle")
 
 # α = 1.5
 ax21 = Axis(fig[2,1], ylabel=L"P_{\mathrm{exc}}(j_0,t)", limits=(0,nothing,0.9,1.001))
-ax22 = Axis(fig[2,2], ylabel=L"\langle |j-j_0| \rangle")
+ax22 = Axis(fig[2,2], ylabel=ylabel=L"\bar{r}(t)")#\langle |j-j_0| \rangle")
 
 # α = 0.5
 ax31 = Axis(fig[3,1],
@@ -36,7 +36,7 @@ ax31 = Axis(fig[3,1],
 
 ax32 = Axis(fig[3,2],
     xlabel="time",
-    ylabel=L"\langle |j-j_0| \rangle"
+    ylabel=L"\bar{r}(t)"#\langle |j-j_0| \rangle"
 )
 
 # ====================================================
@@ -59,7 +59,7 @@ text!(ax32,0.4,0.1,text=L"\alpha=0.5",space=:relative,fontsize=28)
 function plot_alpha!(ax_exc, ax_disp, α; legend=false)
 
     # ----- ED
-    @load "../ED_Z3ClockChain/ED_Z3_L13_alpha$(α)_g0.5_single_excitation.jld2" times center_exc avg_disp
+    @load "../ED_Z3ClockChain/Z3/ED_Z3_L13_alpha$(α)_g0.5_single_excitation.jld2" times center_exc avg_disp
 
     lines!(ax_exc, times, center_exc,
         color=:black, linewidth=3, label=legend ? "ED" : nothing)
@@ -68,7 +68,7 @@ function plot_alpha!(ax_exc, ax_disp, α; legend=false)
         color=:black, linewidth=3)
 
     # ----- Gaussian
-    @load "../pTWA_Z3ClockChain/pTWA_Z3_L13_alpha$(α)_g0.5_single_excitation_gaussian_N10000.jld2" times center_exc center_err avg_disp disp_err
+    @load "../pTWA_Z3ClockChain/Clock_Z3/pTWA_Z3_L13_alpha$(α)_g0.5_single_excitation_gaussian_N10000.jld2" times center_exc center_err avg_disp disp_err
 
     errorbars!(ax_exc, times, center_exc, center_err,
         color=:red, whiskerwidth=4)
@@ -84,18 +84,18 @@ function plot_alpha!(ax_exc, ax_disp, α; legend=false)
         color=:red, linestyle=:dash)
 
     # # ----- Discrete
-    @load "../pTWA_Z3ClockChain/pTWA_Z3_L13_alpha$(α)_g0.5_single_excitation_discrete_N10000.jld2" times center_exc center_err avg_disp disp_err
+    @load "../pTWA_Z3ClockChain/Clock_Z3/pTWA_Z3_L13_alpha$(α)_g0.5_single_excitation_discrete_N10000.jld2" times center_exc center_err avg_disp disp_err
 
     errorbars!(ax_exc, times, center_exc, center_err,
-        color=:blue, whiskerwidth=4)
+        color=:blue, whiskerwidth=4 )
 
-    lines!(ax_exc, times, center_exc,
+    lines!(ax_exc, times, center_exc, linestyle=:dash,
         color=:blue, label=legend ? "Discrete" : nothing)
 
     errorbars!(ax_disp, times, avg_disp, disp_err,
         color=:blue, whiskerwidth=4)
 
-    lines!(ax_disp, times, avg_disp,
+    lines!(ax_disp, times, avg_disp, linestyle=:dash,
         color=:blue)
 
 end
