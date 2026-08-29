@@ -217,17 +217,16 @@ applications, see the accompanying paper:
 
 The numerical calculations in this repository are implemented in Julia.
 
-- **Tensor-network / TEBD calculations:**  
-  We use the [ITensor Julia libraries](https://docs.itensor.org/Overview/) for matrix-product-state and time-evolution calculations.
+- **TEBD / tensor-network calculations:**  
+  The matrix-product-state time-evolution routines used here are implemented
+  directly in Julia, including the Vidal-form MPS representation, two-site
+  gates, SVD-based bond truncation, and even/odd Trotter evolution.
 
 - **Visualization:**  
-  Figures are generated with [CairoMakie.jl](https://docs.makie.org/stable/explanations/backends/cairomakie) from the Makie Julia visualization ecosystem.
+  Figures are generated with
+  [CairoMakie.jl](https://docs.makie.org/stable/explanations/backends/cairomakie).
 
 Related Julia projects by Javad Vahedi:
 
-- [SpinDynamics.jl](https://github.com/javahedi/SpinDynamics.jl) — a Julia package for quantum spin dynamics using Krylov and Chebyshev propagation methods. 
-- [OpenSpinDynamics.jl](https://github.com/javahedi/OpenSpinDynamics.jl) — a Julia-based library for simulating open quantum spin-system dynamics. 
-
-These projects are independent of the pTWA implementation in this repository,
-but share the broader goal of providing transparent and reusable numerical
-tools for nonequilibrium quantum dynamics.
+- [SpinDynamics.jl](https://github.com/javahedi/SpinDynamics.jl) — quantum spin dynamics using Krylov and Chebyshev propagation.
+- [OpenSpinDynamics.jl](https://github.com/javahedi/OpenSpinDynamics.jl) — tools for open quantum spin-system dynamics.
