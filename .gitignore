@@ -1,6 +1,17 @@
 venv/
 /report
-.DS_Store
 reply_to_referee/
 
 Manifest*
+
+
+# Generated numerical data
+Fig*/data/
+Fig*/data/**
+
+# Julia generated files
+Manifest.toml
+
+# macOS
+.DS_Store
+**/.DS_Store
