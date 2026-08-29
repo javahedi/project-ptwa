@@ -6,6 +6,7 @@
        width="850">
 </p>
 
+
 <p align="center">
   <b>Semiclassical phase-space dynamics for interacting parafermionic quantum systems</b>
 </p>
@@ -41,7 +42,7 @@ are incorporated through stochastic Wigner sampling, after which the
 phase-space variables evolve according to classical Lie–Poisson equations.
 
 The method provides a scalable route to studying nonequilibrium dynamics
-in parafermionic and generalized \(\mathbb Z_n\) systems beyond system
+in parafermionic and generalized \($\mathbb Z_n$    \) systems beyond system
 sizes accessible to exact many-body simulations.
 
 ---
@@ -55,7 +56,7 @@ checks, and plotting code needed for that figure.
 ```text
 .
 ├── Fig1_Schematic/
-│   └── Fig0_Schematic_v2.png
+│   └── Fig1_Schematic_v2.png
 │
 ├── Fig2_lmg/
 │   └── ...
@@ -69,7 +70,7 @@ checks, and plotting code needed for that figure.
 ├── Fig5_Imbalance_L12/
 │   └── ...
 │
-├── Fig6-Zn/
+├── Fig6_Zn/
 │   └── ...
 └── 
 ```
@@ -166,13 +167,11 @@ evolves an \(n\times n\) phase-space matrix on every site.
 
 The dynamical state therefore requires 
 
-$$
-\mathcal O(Nn^2)
-$$
+$$\mathcal O(Nn^2)$$
 
 variables. For local interactions the equations of motion scale linearly
 with system size \(N\) at fixed \(n\), while dense local matrix operations
-have a generic \(\mathcal O(n^3)\) cost.
+have a generic \($\mathcal O(n^3)$\) cost.
 
 Most importantly, different stochastic trajectories are independent and
 can be parallelized straightforwardly.
