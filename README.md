@@ -116,24 +116,16 @@ regenerated and checked without depending on scripts from another figure.
 
 For local Hubbard operators
 
-\[
-X_j^{ab}=|a\rangle_j\langle b|,
-\]
+$$X_j^{ab}=|a\rangle_j\langle b|,$$
 
 the local operator algebra is
 
-\[
-[X^{ab},X^{cd}]
-=
-\delta_{bc}X^{ad}
--
-\delta_{ad}X^{cb}.
-\]
+$$[X^{ab},X^{cd}]=\delta_{bc}X^{ad}-\delta_{ad}X^{cb}.$$
 
 Introducing phase-space variables \(x_j^{ab}\), the corresponding
 Lie–Poisson structure is
 
-\[
+$$
 \{x_j^{ab},x_k^{cd}\}
 =
 i\delta_{jk}
@@ -142,23 +134,19 @@ i\delta_{jk}
 -
 \delta_{ad}x_j^{cb}
 \right).
-\]
+$$
 
 Writing
 
-\[
-(\mathbf h_j)_{ba}
-=
-\frac{\partial H_W}{\partial x_j^{ab}},
-\]
+$$(\mathbf h_j)_{ba}=\frac{\partial H_W}{\partial x_j^{ab}},$$
 
 the pTWA equations of motion take the compact matrix form
 
-\[
+$$
 \dot{\mathbf x}_j
 =
 i[\mathbf x_j,\mathbf h_j].
-\]
+$$
 
 The initial quantum fluctuations are represented by stochastic sampling
 of the phase-space variables. The repository contains implementations of
