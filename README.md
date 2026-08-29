@@ -194,6 +194,7 @@ If this code or the pTWA approach is useful for your work, please cite:
 }
 ```
 
+
 ---
 
 ## Authors
@@ -210,3 +211,23 @@ applications, see the accompanying paper:
 <p align="center">
   <b>Parafermionic quantum dynamics → local phase space → stochastic semiclassical evolution</b>
 </p>
+
+
+## Software and related projects
+
+The numerical calculations in this repository are implemented in Julia.
+
+- **Tensor-network / TEBD calculations:**  
+  We use the [ITensor Julia libraries](https://docs.itensor.org/Overview/) for matrix-product-state and time-evolution calculations.
+
+- **Visualization:**  
+  Figures are generated with [CairoMakie.jl](https://docs.makie.org/stable/explanations/backends/cairomakie) from the Makie Julia visualization ecosystem.
+
+Related Julia projects by Javad Vahedi:
+
+- [SpinDynamics.jl](https://github.com/javahedi/SpinDynamics.jl) — a Julia package for quantum spin dynamics using Krylov and Chebyshev propagation methods. 
+- [OpenSpinDynamics.jl](https://github.com/javahedi/OpenSpinDynamics.jl) — a Julia-based library for simulating open quantum spin-system dynamics. 
+
+These projects are independent of the pTWA implementation in this repository,
+but share the broader goal of providing transparent and reusable numerical
+tools for nonequilibrium quantum dynamics.
