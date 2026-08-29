@@ -1,7 +1,7 @@
 # Parafermionic Truncated Wigner Approximation
 
 <p align="center">
-  <img src="Fig1_Schematic/Fig0_Schematic_v2.png"
+  <img src="Fig1_Schematic/Fig1_Schematic_v2.png"
        alt="Parafermionic Truncated Wigner Approximation schematic"
        width="850">
 </p>
@@ -125,16 +125,7 @@ $$[X^{ab},X^{cd}]=\delta_{bc}X^{ad}-\delta_{ad}X^{cb}.$$
 Introducing phase-space variables \(x_j^{ab}\), the corresponding
 Lie–Poisson structure is
 
-$$
-\{x_j^{ab},x_k^{cd}\}
-=
-i\delta_{jk}
-\left(
-\delta_{bc}x_j^{ad}
--
-\delta_{ad}x_j^{cb}
-\right).
-$$
+$$\{x_j^{ab},x_k^{cd}\}=i\delta_{jk}\left(\delta_{bc}x_j^{ad}-\delta_{ad}x_j^{cb}\right).$$
 
 Writing
 
@@ -142,11 +133,7 @@ $$(\mathbf h_j)_{ba}=\frac{\partial H_W}{\partial x_j^{ab}},$$
 
 the pTWA equations of motion take the compact matrix form
 
-$$
-\dot{\mathbf x}_j
-=
-i[\mathbf x_j,\mathbf h_j].
-$$
+$$\dot{\mathbf x}_j=i[\mathbf x_j,\mathbf h_j].$$
 
 The initial quantum fluctuations are represented by stochastic sampling
 of the phase-space variables. The repository contains implementations of
@@ -177,11 +164,11 @@ The implementation exploits the local Hubbard-operator representation.
 For a chain of \(N\) sites with local Hilbert-space dimension \(n\), pTWA
 evolves an \(n\times n\) phase-space matrix on every site.
 
-The dynamical state therefore requires
+The dynamical state therefore requires 
 
-\[
+$$
 \mathcal O(Nn^2)
-\]
+$$
 
 variables. For local interactions the equations of motion scale linearly
 with system size \(N\) at fixed \(n\), while dense local matrix operations
