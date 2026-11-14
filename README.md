@@ -1,7 +1,7 @@
 # Parafermionic Truncated Wigner Approximation
 
 <p align="center">
-  <img src="Fig1_Schematic/Fig0_Schematic_v3.pdf"
+  <img src="Fig1_Schematic/Fig0_Schematic_v3.png"
        alt="Parafermionic Truncated Wigner Approximation schematic"
        width="850">
 </p>
